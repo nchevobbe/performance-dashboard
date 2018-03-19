@@ -1,37 +1,136 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<link rel="icon" href="favicon.svg" />
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="favicon.svg" />
+  <link rel="stylesheet" type="text/css" href="css/common.css" />
+  <link rel="stylesheet" type="text/css" href="css/graph.css" />
 
-<link rel="stylesheet" type="text/css" href="css/common.css" />
+  <script type="text/javascript" src="js/d3.v4.min.js"></script>
+  <script type="text/javascript" src="js/graph.js"></script>
+  <script type="text/javascript" src="js/fetch.js"></script>
+  
+  <script type="text/javascript" src="perfherder/perfherder-signatures.js"></script>
+  <script type="text/javascript" src="perfherder/perfherder.js"></script>
 
-<h3><a href="select.html">Graph explorer</a></h3>
-<br/>
-<h3><a href="tools/inspector.html">Inspector performance</a></h3>
-<h3><a href="tools/console.html">Console performance</a></h3>
-<h3><a href="tools/netmonitor.html">Netmonitor performance</a></h3>
-<h3><a href="tools/debugger.html">Debugger performance</a></h3>
-<br/>
-<h3><a href="tools/global.html">Panel agnostic performance</a></h3>
+  <title>DevTools Performance Dashboard</title>
+</head>
+<body>
+  <header>
+    <h1>DevTools Performance Dashboard</h1>
+  </header>
+  
+  <aside>
+    <h2>Performance charts</h2>
+    <ul class="damp">
+      <li data-tool="graph-explorer">Graph explorer</li>
+      <li data-tool="global">Panel agnostic</li>
+      <li data-tool="inspector">Inspector</li>
+      <li data-tool="console">Console</li>
+      <li data-tool="netmonitor">Netmonitor</li>
+      <li data-tool="debugger">Debugger</li>
+    </ul>
 
-<br/>
-<h2>Telemetry:</h2>
-Toolbox “cold” opening
-  <a href="https://telemetry.mozilla.org/new-pipeline/dist.html#!cumulative=0&end_date=2017-11-19&keys=inspector!webconsole!netmonitor!jsdebugger&max_channel_version=nightly%252F59&measure=DEVTOOLS_COLD_TOOLBOX_OPEN_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-11-13&table=0&trim=1&use_submission_date=0">distribution</a> -
-  <a href="https://telemetry.mozilla.org/new-pipeline/evo.html#!cumulative=0&end_date=2017-11-19&keys=inspector!webconsole!netmonitor!jsdebugger&max_channel_version=nightly%252F59&measure=DEVTOOLS_COLD_TOOLBOX_OPEN_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-11-13&table=0&trim=1&use_submission_date=0">evolution</a>
-<br/>
-Toolbox “warm” opening 
-  <a href="https://telemetry.mozilla.org/new-pipeline/dist.html#!cumulative=0&end_date=2017-11-19&keys=inspector!webconsole!netmonitor!jsdebugger&max_channel_version=nightly%252F59&measure=DEVTOOLS_COLD_TOOLBOX_OPEN_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-11-13&table=0&trim=1&use_submission_date=0">distribution</a> -
-  <a href="https://telemetry.mozilla.org/new-pipeline/evo.html#!cumulative=0&end_date=2017-11-19&keys=inspector!webconsole!netmonitor!jsdebugger&max_channel_version=nightly%252F59&measure=DEVTOOLS_COLD_TOOLBOX_OPEN_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-11-13&table=0&trim=1&use_submission_date=0">evolution</a>
-<br/>
-Page reload 
-  <a href="https://telemetry.mozilla.org/new-pipeline/dist.html#!cumulative=0&end_date=2017-11-19&keys=inspector!webconsole!__none__!__none__&max_channel_version=nightly%252F59&measure=DEVTOOLS_TOOLBOX_PAGE_RELOAD_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-11-13&table=0&trim=1&use_submission_date=0">distribution -
-  <a href="https://telemetry.mozilla.org/new-pipeline/evo.html#!aggregates=median&cumulative=0&end_date=2017-11-05&keys=inspector!webconsole!__none__!__none__&max_channel_version=nightly%252F59&measure=DEVTOOLS_TOOLBOX_PAGE_RELOAD_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-10-24&trim=1&use_submission_date=0">evolution</a>
-<br/>
-Inspector “new-root to full reload” 
-  <a href="https://telemetry.mozilla.org/new-pipeline/dist.html#!cumulative=0&end_date=2017-11-19&keys=__none__!__none__!__none__&max_channel_version=nightly%252F59&measure=DEVTOOLS_INSPECTOR_NEW_ROOT_TO_RELOAD_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-11-13&table=0&trim=1&use_submission_date=0">distribution</a> -
-  <a href="https://telemetry.mozilla.org/new-pipeline/evo.html#!aggregates=median&cumulative=0&end_date=2017-11-19&keys=!__none__!__none__&max_channel_version=nightly%252F59&measure=DEVTOOLS_INSPECTOR_NEW_ROOT_TO_RELOAD_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-11-13&trim=1&use_submission_date=0">evolution</a>
-<h2>BHR</h2>
-<a href="https://arewesmoothyet.com/?mode=track&trackedStat=Devtools%20Hangs">BHR related to DevTools</a> <br/>
-<a href="https://arewesmoothyet.com/?mode=track&trackedStat=All%20Hangs">All BHR</a>
-<br/><br/>
-[ <a href="https://github.com/devtools-html/performance-dashboard">Dashboard sources</a> ]
+    <h2>Telemetry</h2>
+    <ul class="telemetry">
+      <li>
+        Toolbox “cold” opening
+        <a href="https://telemetry.mozilla.org/new-pipeline/dist.html#!cumulative=0&end_date=2017-11-19&keys=inspector!webconsole!netmonitor!jsdebugger&max_channel_version=nightly%252F59&measure=DEVTOOLS_COLD_TOOLBOX_OPEN_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-11-13&table=0&trim=1&use_submission_date=0">distribution</a> -
+        <a href="https://telemetry.mozilla.org/new-pipeline/evo.html#!cumulative=0&end_date=2017-11-19&keys=inspector!webconsole!netmonitor!jsdebugger&max_channel_version=nightly%252F59&measure=DEVTOOLS_COLD_TOOLBOX_OPEN_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-11-13&table=0&trim=1&use_submission_date=0">evolution</a>
+      </li>
+      <li>
+        Toolbox “warm” opening 
+        <a href="https://telemetry.mozilla.org/new-pipeline/dist.html#!cumulative=0&end_date=2017-11-19&keys=inspector!webconsole!netmonitor!jsdebugger&max_channel_version=nightly%252F59&measure=DEVTOOLS_COLD_TOOLBOX_OPEN_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-11-13&table=0&trim=1&use_submission_date=0">distribution</a> -
+        <a href="https://telemetry.mozilla.org/new-pipeline/evo.html#!cumulative=0&end_date=2017-11-19&keys=inspector!webconsole!netmonitor!jsdebugger&max_channel_version=nightly%252F59&measure=DEVTOOLS_COLD_TOOLBOX_OPEN_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-11-13&table=0&trim=1&use_submission_date=0">evolution</a>
+      </li>
+      <li>
+        Page reload 
+        <a href="https://telemetry.mozilla.org/new-pipeline/dist.html#!cumulative=0&end_date=2017-11-19&keys=inspector!webconsole!__none__!__none__&max_channel_version=nightly%252F59&measure=DEVTOOLS_TOOLBOX_PAGE_RELOAD_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-11-13&table=0&trim=1&use_submission_date=0">distribution -
+        <a href="https://telemetry.mozilla.org/new-pipeline/evo.html#!aggregates=median&cumulative=0&end_date=2017-11-05&keys=inspector!webconsole!__none__!__none__&max_channel_version=nightly%252F59&measure=DEVTOOLS_TOOLBOX_PAGE_RELOAD_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-10-24&trim=1&use_submission_date=0">evolution</a>        
+      </li>
+      <li>
+        Inspector “new-root to full reload” 
+        <a href="https://telemetry.mozilla.org/new-pipeline/dist.html#!cumulative=0&end_date=2017-11-19&keys=__none__!__none__!__none__&max_channel_version=nightly%252F59&measure=DEVTOOLS_INSPECTOR_NEW_ROOT_TO_RELOAD_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-11-13&table=0&trim=1&use_submission_date=0">distribution</a> -
+        <a href="https://telemetry.mozilla.org/new-pipeline/evo.html#!aggregates=median&cumulative=0&end_date=2017-11-19&keys=!__none__!__none__&max_channel_version=nightly%252F59&measure=DEVTOOLS_INSPECTOR_NEW_ROOT_TO_RELOAD_DELAY_MS&min_channel_version=nightly%252F58&processType=*&product=Firefox&sanitize=0&sort_keys=submissions&start_date=2017-11-13&trim=1&use_submission_date=0">evolution</a>      
+      </li>
+    </ul>
+
+    <h2><abbr title="Background Hangs Report">BHR</abbr></h2>
+    <ul class="bhr">
+      <li><a href="https://arewesmoothyet.com/?mode=track&trackedStat=Devtools%20Hangs">BHR related to DevTools</a></li>
+      <li><a href="https://arewesmoothyet.com/?mode=track&trackedStat=All%20Hangs">All BHR</a></li>
+    </ul>
+  </aside>
+  <main>
+    <h2>Select an item in the sidebar</h2>
+  </main>
+  <footer><a href="https://github.com/devtools-html/performance-dashboard">Dashboard sources</a></footer>
+
+  <script>
+    const main = document.querySelector("main");
+    document.querySelector(".damp").addEventListener("click", e => {
+      const tool = e.target.getAttribute("data-tool");
+      if (!tool) {
+        return;
+      }
+
+      selectTool(tool);
+    });
+
+    async function selectTool(tool) {
+      console.log("selectTool", tool);
+      main.innerHTML = "";
+
+      if (TESTS[tool]) {
+        console.log("Loading tests", TESTS[tool]);
+
+        let interval = 14;
+        let platform = "windows7-32-opt";
+
+        TESTS[tool].forEach(async (test) => {
+          const data = await loadPerfHerderData({
+            interval,
+            platform,
+            test,
+          });
+          
+          main.appendChild(renderPerHerderData(data));
+        });
+      }
+    }
+
+    function el(tagName, attributes, content) {
+      let el = document.createElement(tagName);
+      Object.entries(attributes)
+        .forEach(([key, value]) => el.setAttribute(key, value));
+
+      if (content) {
+        el.innerHTML = content;
+      }
+      return el;
+    }
+
+    const TESTS = {
+      global: [],
+      inspector: [],
+      console: [
+        "complicated.webconsole.open",
+        // "complicated.webconsole.reload",
+        // "complicated.webconsole.close",
+        // "custom.webconsole.open",
+        // "custom.webconsole.reload",
+        // "custom.webconsole.close",
+        // "simple.webconsole.open",
+        // "simple.webconsole.reload",
+        // "simple.webconsole.close",
+        // "console.objectexpand",
+        // "console.objectexpanded.close",
+        // "console.openwithcache.open",
+        // "console.bulklog",
+        // "console.streamlog",
+      ],
+      netmonitor: [],
+      debugger: [],
+    };
+
+  </script>
+</body>

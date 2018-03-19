@@ -9,9 +9,14 @@ let PerfHerderTimings = {
   365: 31536000, // last year
 };
 function buildTreeHerderURL({ interval, signature }) {
-  let url = "https://treeherder.mozilla.org/api/project/mozilla-central/performance/data/" +
-    "?format=json&framework=1&interval=" + interval + "&signatures=" + signature;
-  return url;
+  return "https://treeherder.mozilla.org/api/project/mozilla-central/performance/data/?" + (
+    new URLSearchParams({
+      format: "json",
+      framework: "1", 
+      interval,
+      signatures: signature,
+    })
+  );
 }
 async function getPushIdRevision(push_id, callback) {
   let url = "https://treeherder.mozilla.org/api/project/mozilla-central/resultset/" + push_id + "/";
@@ -50,7 +55,7 @@ async function fetchObsoleteTests(old_signatures, interval, data) {
     }
   }
 }
-async function loadPerfHerder({ interval, platform, test }) {
+async function loadPerfHerderData({ interval, platform, test }) {
   let signatures = PerfHerderSignatures[test]
   if (!signatures) {
     throw new Error("Unable to find any DAMP test named '" + test + "'");
@@ -63,7 +68,6 @@ async function loadPerfHerder({ interval, platform, test }) {
   console.log("signature", signature, "id", perfHerderId);
   let url = buildTreeHerderURL({ interval, signature });
 
-  document.getElementById("loading").style.display = "block";
   let data = [];
 
   let { old_signatures } = signatures.platforms[platform];
@@ -118,7 +122,24 @@ async function loadPerfHerder({ interval, platform, test }) {
   }
   */
 
-  document.getElementById("loading").style.display = "none";
+  // document.getElementById("loading").style.display = "none";
+  // let g = graph(data, {
+  //   displayAverageLine: true,
+  //   //cummulativeData: settleData,
+  // });
+
+  // // Display a link to PerfHerder
+  // let perfHerderLink = "https://treeherder.mozilla.org/perf.html#/graphs?timerange=" + interval + "&series=mozilla-central," + perfHerderId+ ",1,1";
+  // g.append("a")
+  //  .attr("xlink:href", perfHerderLink)
+  //  .attr("target", "_blank")
+  //  .append("text")
+  //  .attr("x", 10)
+  //  .attr("y", 10)
+  //  .text("PerfHerder");
+}
+
+function renderPerfHerderData(data) {
   let g = graph(data, {
     displayAverageLine: true,
     //cummulativeData: settleData,
@@ -135,20 +156,20 @@ async function loadPerfHerder({ interval, platform, test }) {
    .text("PerfHerder");
 }
 
-function update() {
-  let params = new URL(window.location).searchParams;
-  if (!params.get("test")) {
-    return;
-  }
-  let interval = PerfHerderTimings[params.get("days") || 14];
-  let platform = params.get("platform") || "windows7-32-opt";
-  loadPerfHerder({
-    interval,
-    platform,
-    test: params.get("test"),
-  });
-}
+// function update() {
+//   let params = new URL(window.location).searchParams;
+//   if (!params.get("test")) {
+//     return;
+//   }
+//   let interval = PerfHerderTimings[params.get("days") || 14];
+//   let platform = params.get("platform") || "windows7-32-opt";
+//   loadPerfHerderData({
+//     interval,
+//     platform,
+//     test: params.get("test"),
+//   });
+// }
 
-window.addEventListener("load", update);
-window.addEventListener("resize", update);
-window.addEventListener("popstate", update);
+// window.addEventListener("load", update);
+// window.addEventListener("resize", update);
+// window.addEventListener("popstate", update);
